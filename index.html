@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>名古屋親子遊</title>
+    <meta name="theme-color" content="#ffffff">
+    <link rel="manifest" href="manifest.json">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js for Data Visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Noto Sans TC', sans-serif; 
+            background-color: #F9FAFB; 
+            -webkit-tap-highlight-color: transparent; 
+            overscroll-behavior-y: none;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out; }
+        .animate-slide-up { animation: slideUp 0.3s ease-out; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        /* Checkbox Style */
+        input[type="checkbox"]:checked + div {
+            background-color: #EC4899; 
+            border-color: #EC4899;
+        }
+        input[type="checkbox"]:checked + div i { opacity: 1; }
+        input[type="checkbox"]:checked ~ span {
+            text-decoration: line-through;
+            color: #9CA3AF;
+        }
+    </style>
+</head>
+<body class="text-gray-700 select-none">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-3 shadow-sm transition-all duration-300" id="main-header">
+        <div class="flex justify-between items-center mb-2">
+            <div>
+                <h1 class="text-lg font-bold tracking-wide text-gray-800">百萬名古屋之旅</h1>
+                <div class="text-[10px] text-gray-400 tracking-wider">FAMILY TOUR 2025</div>
+            </div>
+            <div id="weather-display" class="text-xs font-medium bg-blue-50 text-blue-600 px-3 py-1 rounded-full flex items-center shadow-sm border border-blue-100">
+                <i class="fas fa-spinner fa-spin mr-1"></i> 載入中...
+            </div>
+        </div>
+        <!-- Day Selector (Hidden on Info & Budget tabs) -->
+        <div class="flex overflow-x-auto hide-scrollbar space-x-3 py-1 transition-all duration-300" id="day-nav">
+            <!-- JS will populate this -->
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="app-content" class="p-4 min-h-screen pb-24">
+        <!-- Content Injected Here -->
+    </main>
+
+    <!-- Budget Modal (Add/Edit) -->
+    <div id="budget-modal" class="fixed inset-0 bg-black/60 z-[60] hidden flex items-end sm:items-center justify-center backdrop-blur-sm transition-opacity">
+        <div class="bg-white w-full sm:w-96 rounded-t-2xl sm:rounded-2xl p-6 animate-slide-up shadow-2xl relative">
+            
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold" id="modal-title">新增支出</h3>
+                <div class="flex space-x-4">
+                    <button id="btn-delete" onclick="deleteExpense()" class="hidden text-red-400 hover:text-red-600">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    <button onclick="closeBudgetModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            
+            <input type="text" id="expense-item" placeholder="項目 (如: 午餐)" class="w-full mb-3 p-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-blue-500 outline-none transition-colors">
+            
+            <div class="relative mb-4">
+                <span class="absolute left-3 top-3 text-gray-400">¥</span>
+                <input type="number" id="expense-amount" placeholder="金額 (日幣)" class="w-full p-3 pl-8 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-blue-500 outline-none transition-colors">
+                <div class="absolute right-3 top-3.5 text-xs text-gray-400" id="twd-preview">≈ NT$0</div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 mb-6">
+                <button onclick="setCategory('food')" class="cat-btn py-2.5 rounded-xl border border-gray-200 text-sm font-medium transition-all" data-cat="food">🍜 食物</button>
+                <button onclick="setCategory('transport')" class="cat-btn py-2.5 rounded-xl border border-gray-200 text-sm font-medium transition-all" data-cat="transport">🚌 交通</button>
+                <button onclick="setCategory('shop')" class="cat-btn py-2.5 rounded-xl border border-gray-200 text-sm font-medium transition-all" data-cat="shop">🎁 購物</button>
+            </div>
+
+            <button id="btn-save" onclick="handleSaveExpense()" class="w-full bg-gray-900 text-white py-3.5 rounded-xl font-bold shadow-lg active:scale-[0.98] transition-transform">儲存紀錄</button>
+        </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="fixed bottom-0 w-full bg-white/95 backdrop-blur border-t border-gray-200 flex justify-around py-2 pb-safe z-40 text-[10px] text-gray-400 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]">
+        <button onclick="switchTab('itinerary')" class="nav-tab flex flex-col items-center w-full py-2 text-red-500" data-tab="itinerary">
+            <i class="fas fa-map-location-dot text-xl mb-1"></i>行程
+        </button>
+        <button onclick="switchTab('info')" class="nav-tab flex flex-col items-center w-full py-2" data-tab="info">
+            <i class="fas fa-passport text-xl mb-1"></i>手冊
+        </button>
+        <button onclick="switchTab('budget')" class="nav-tab flex flex-col items-center w-full py-2" data-tab="budget">
+            <i class="fas fa-chart-pie text-xl mb-1"></i>記帳
+        </button>
+    </nav>
+
+    <!-- Load Data -->
+    <script src="data.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "SENDER_ID",
+            appId: "APP_ID"
+        };
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+            window.db = db;
+            window.dbCollection = collection;
+            window.dbAddDoc = addDoc;
+            window.dbDoc = doc;
+            window.dbUpdateDoc = updateDoc;
+            window.dbDeleteDoc = deleteDoc;
+            window.dbQuery = query;
+            window.dbOrderBy = orderBy;
+            window.dbOnSnapshot = onSnapshot;
+            window.dbTimestamp = serverTimestamp;
+            if(window.initBudgetListenerExternal) window.initBudgetListenerExternal();
+        } catch (e) {
+            console.warn("Firebase offline mode.", e);
+        }
+    </script>
+
+    <script>
+        // --- Configuration ---
+        const EXCHANGE_RATE = 0.22; 
+        
+        // --- State ---
+        let currentDayIndex = 0;
+        let currentTab = 'itinerary';
+        let expenseCategory = 'food';
+        let localExpenses = [];
+        let editingExpenseId = null; 
+        let expenseChartInstance = null; // Store chart instance to destroy/update
+
+        // --- DOM Elements ---
+        const dayNav = document.getElementById('day-nav');
+        const mainContent = document.getElementById('app-content');
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDayNav();
+            renderItinerary(0);
+            fetchWeather(itineraryData[0].weatherQuery);
+            window.initBudgetListenerExternal = initBudgetListener;
+            
+            document.getElementById('expense-amount').addEventListener('input', (e) => {
+                const val = parseInt(e.target.value) || 0;
+                document.getElementById('twd-preview').innerText = `≈ NT$${Math.round(val * EXCHANGE_RATE)}`;
+            });
+        });
+
+        // --- 1. Navigation Logic (Updated) ---
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // UI: Tab Icons
+            document.querySelectorAll('.nav-tab').forEach(el => {
+                if (el.dataset.tab === tab) {
+                    el.classList.remove('text-gray-400');
+                    el.classList.add('text-red-500');
+                } else {
+                    el.classList.add('text-gray-400');
+                    el.classList.remove('text-red-500');
+                }
+            });
+
+            // UI: Hide Day Nav on Info AND Budget pages
+            const dayNavEl = document.getElementById('day-nav');
+            if (tab === 'info' || tab === 'budget') {
+                dayNavEl.classList.add('hidden');
+                dayNavEl.classList.remove('flex');
+            } else {
+                dayNavEl.classList.remove('hidden');
+                dayNavEl.classList.add('flex');
+            }
+
+            window.scrollTo(0,0);
+            if (tab === 'itinerary') renderItinerary(currentDayIndex);
+            if (tab === 'info') renderInfo();
+            if (tab === 'budget') renderBudgetPage();
+        }
+
+        function renderDayNav() {
+            dayNav.innerHTML = itineraryData.map((day, index) => `
+                <button onclick="selectDay(${index})" 
+                    class="day-btn flex-shrink-0 whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold transition-all duration-200 
+                    ${index === 0 ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 bg-gray-50 border border-gray-100'}">
+                    ${day.day}
+                </button>
+            `).join('');
+        }
+
+        function selectDay(index) {
+            currentDayIndex = index;
+            document.querySelectorAll('.day-btn').forEach((btn, i) => {
+                btn.className = i === index 
+                    ? "day-btn flex-shrink-0 whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold bg-gray-800 text-white shadow-md transform scale-105 transition-all"
+                    : "day-btn flex-shrink-0 whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold text-gray-500 bg-gray-50 border border-gray-100 transition-all";
+            });
+            document.querySelectorAll('.day-btn')[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            renderItinerary(index);
+            fetchWeather(itineraryData[index].weatherQuery);
+        }
+
+        // --- 2. Itinerary Rendering ---
+        function renderItinerary(index) {
+            const day = itineraryData[index];
+            let html = `
+                <div class="mb-6 mt-2 animate-fade-in px-2">
+                    <h2 class="text-2xl font-black text-gray-800 tracking-tight">${day.title}</h2>
+                    <p class="text-gray-500 text-sm font-medium flex items-center mt-1">
+                        <i class="fas fa-map-pin mr-1.5 text-red-500"></i>${day.location}
+                        <span class="mx-2 text-gray-300">|</span>
+                        <span>${day.date}</span>
+                    </p>
+                </div>`;
+
+            if(day.events.length === 0) html += `<div class="text-center text-gray-400 py-10">尚無行程資料</div>`;
+
+            html += day.events.map(event => {
+                let borderClass = 'border-l-[6px] border-gray-200';
+                let typeIcon = event.icon || '📍';
+                let typeColor = 'text-gray-400';
+                let cardBg = 'bg-white';
+                if (event.type === 'food') { borderClass = 'border-l-[6px] border-orange-400'; typeIcon = '🍴'; typeColor = 'text-orange-500'; }
+                if (event.type === 'transport') { borderClass = 'border-l-[6px] border-blue-400'; typeIcon = '🚍'; typeColor = 'text-blue-500'; }
+                if (event.type === 'shop') { borderClass = 'border-l-[6px] border-pink-400'; typeIcon = '🛍️'; typeColor = 'text-pink-500'; }
+                if (event.type === 'spot') { borderClass = 'border-l-[6px] border-emerald-400'; typeIcon = '🎡'; typeColor = 'text-emerald-500'; }
+                if (event.type === 'hotel') { borderClass = 'border-l-[6px] border-indigo-400'; typeIcon = '🏨'; typeColor = 'text-indigo-500'; }
+
+                let badge = event.tags ? event.tags.map(tag => `<span class="inline-flex items-center text-[10px] px-2 py-0.5 rounded-md mr-1.5 mb-1 ${tag.includes('必') ? 'bg-red-50 text-red-600 font-bold border border-red-100' : 'bg-gray-100 text-gray-600'}">${tag}</span>`).join('') : '';
+                let transportBlock = event.transportInfo ? `<div class="mt-3 bg-blue-50/80 p-3 rounded-xl border border-blue-100"><div class="text-xs font-bold text-blue-800 mb-1 flex items-center"><i class="fas fa-ticket-alt mr-1.5"></i>交通資訊</div><div class="flex justify-between items-start"><div class="text-sm text-blue-900 font-bold">${event.transportInfo.route}</div><div class="text-xs text-blue-600 font-mono bg-white px-1.5 rounded">${event.transportInfo.price}</div></div>${event.transportInfo.note ? `<div class="text-[11px] text-blue-600 mt-1 leading-tight opacity-80">⚠️ ${event.transportInfo.note}</div>` : ''}</div>` : '';
+                let photoBlock = event.photoSpots ? `<div class="mt-3 bg-emerald-50/80 p-3 rounded-xl border border-emerald-100"><div class="text-xs font-bold text-emerald-700 mb-1.5 flex items-center"><i class="fas fa-camera mr-1.5"></i>最佳拍照點</div><ul class="text-xs text-emerald-800 space-y-1 pl-1">${event.photoSpots.map(s => `<li class="flex items-start"><span class="mr-1.5 text-emerald-400">•</span>${s}</li>`).join('')}</ul></div>` : '';
+                let shopBlock = event.shoppingList ? `<div class="mt-4 pt-3 border-t border-gray-100"><div class="text-xs font-bold text-pink-500 mb-2 flex items-center"><i class="fas fa-clipboard-check mr-1.5"></i>必買清單</div><ul class="space-y-2">${event.shoppingList.map(item => `<li class="flex items-start group"><label class="flex items-center w-full cursor-pointer relative"><input type="checkbox" class="peer sr-only"><div class="w-4 h-4 border-2 border-gray-300 rounded peer-checked:bg-pink-500 peer-checked:border-pink-500 transition-all mr-2.5 flex items-center justify-center bg-white"><i class="fas fa-check text-white text-[10px] opacity-0 peer-checked:opacity-100"></i></div><span class="text-sm text-gray-600 peer-checked:text-gray-400 peer-checked:line-through transition-colors select-none">${item}</span></label></li>`).join('')}</ul></div>` : '';
+                let altBlock = event.alternatives ? `<div class="mt-4 pt-3 border-t border-dashed border-gray-200"><div class="text-[10px] font-bold text-gray-400 mb-2 tracking-wider">其他選擇 / 備案</div><div class="space-y-2">${event.alternatives.map(alt => `<a ${alt.nav ? `href="${alt.nav}" target="_blank"` : ''} class="block bg-gray-50 hover:bg-gray-100 active:bg-gray-200 p-2.5 rounded-lg border border-gray-100 transition-colors flex justify-between items-center group cursor-pointer"><div><div class="text-sm font-bold text-gray-700 group-hover:text-blue-600">${alt.name}</div><div class="text-xs text-gray-500 line-clamp-1">${alt.desc}</div></div>${alt.nav ? '<i class="fas fa-chevron-right text-gray-300 text-[10px]"></i>' : ''}</a>`).join('')}</div></div>` : '';
+                let tipsBlock = event.tips ? `<div class="mt-3 text-xs bg-amber-50 text-amber-800 p-3 rounded-xl border border-amber-100 flex items-start leading-relaxed"><i class="fas fa-lightbulb mt-0.5 mr-2 flex-shrink-0 text-amber-500"></i><span>${event.tips}</span></div>` : '';
+                let navBtn = event.nav ? `<a href="${event.nav}" target="_blank" class="absolute top-4 right-4 text-blue-500 bg-blue-50 w-8 h-8 flex items-center justify-center rounded-full hover:bg-blue-600 hover:text-white transition-all shadow-sm active:scale-95 z-10"><i class="fas fa-location-arrow text-xs"></i></a>` : '';
+
+                return `
+                <div class="relative ${cardBg} p-5 rounded-2xl card-shadow mb-5 ${borderClass} transition-transform animate-fade-in">
+                    ${navBtn}
+                    <div class="flex items-start">
+                        <div class="mr-4 mt-0.5 text-2xl ${typeColor} w-8 text-center flex-shrink-0">${typeIcon}</div>
+                        <div class="flex-1 w-full min-w-0">
+                            <div class="text-[11px] font-bold text-gray-400 mb-0.5 font-mono tracking-wide uppercase">${event.time}</div>
+                            <h3 class="text-lg font-bold text-gray-800 mb-1.5 leading-tight pr-8">${event.title}</h3>
+                            <div class="flex flex-wrap mb-2">${badge}</div>
+                            <p class="text-sm text-gray-600 leading-relaxed">${event.desc}</p>
+                            ${event.budget ? `<div class="mt-1 text-xs font-medium text-gray-400">💰 預算: ${event.budget}</div>` : ''}
+                            ${tipsBlock} ${transportBlock} ${photoBlock} ${shopBlock} ${altBlock}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+            html += '<div class="h-12 flex items-center justify-center text-gray-300 text-xs italic">End of Day</div>';
+            mainContent.innerHTML = html;
+        }
+
+        // --- 3. Info Page ---
+        function renderInfo() {
+            mainContent.innerHTML = `
+                <div class="animate-fade-in pb-20 space-y-5">
+                    <div class="bg-white p-5 rounded-2xl card-shadow relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-blue-50 rounded-bl-full -mr-10 -mt-10"></div>
+                        <h3 class="text-lg font-bold mb-4 border-b border-gray-100 pb-2 flex items-center relative z-10">
+                            <span class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-2 text-blue-500 text-sm"><i class="fas fa-hotel"></i></span>
+                            住宿資訊
+                        </h3>
+                        <div class="text-sm space-y-3 relative z-10">
+                            <div><p class="font-bold text-gray-800 text-base leading-tight mb-1">${infoData.hotel.name}</p><p class="text-gray-500 text-xs">${infoData.hotel.address}</p></div>
+                            <div class="flex items-center"><i class="fas fa-phone w-5 text-gray-400 text-center mr-1"></i><a href="tel:${infoData.hotel.phone}" class="text-blue-600 font-mono font-medium">${infoData.hotel.phone}</a></div>
+                            <div class="bg-gray-50 p-3 rounded-xl text-xs text-gray-600 space-y-1"><div class="flex justify-between"><span>Check-in</span> <span class="font-bold">${infoData.hotel.checkIn}</span></div><div class="flex justify-between"><span>Check-out</span> <span class="font-bold">${infoData.hotel.checkOut}</span></div><div class="border-t border-gray-200 mt-2 pt-2 text-gray-500"><i class="fas fa-info-circle mr-1"></i>${infoData.hotel.tips}</div></div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl card-shadow">
+                        <h3 class="text-lg font-bold mb-4 border-b border-gray-100 pb-2 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center mr-2 text-orange-500 text-sm"><i class="fas fa-suitcase"></i></span>
+                            出發前檢查
+                        </h3>
+                        <ul class="space-y-3">${infoData.packing.map(item => `<li class="flex items-center text-sm text-gray-700"><label class="flex items-center w-full cursor-pointer relative"><input type="checkbox" class="peer sr-only"><div class="w-5 h-5 border-2 border-gray-300 rounded peer-checked:bg-orange-500 peer-checked:border-orange-500 transition-all mr-3 flex items-center justify-center bg-white"><i class="fas fa-check text-white text-[10px] opacity-0 peer-checked:opacity-100"></i></div><span class="peer-checked:text-gray-400 peer-checked:line-through transition-colors">${item}</span></label></li>`).join('')}</ul>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl card-shadow border-l-4 border-red-500">
+                        <h3 class="text-lg font-bold mb-4 border-b border-gray-100 pb-2 text-red-600 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center mr-2 text-red-500 text-sm"><i class="fas fa-exclamation"></i></span>
+                            緊急聯絡
+                        </h3>
+                        <div class="space-y-3">${infoData.emergency.map(e => `<div class="flex justify-between items-center bg-red-50 p-3 rounded-xl"><span class="text-sm font-bold text-gray-800">${e.name}</span><a href="tel:${e.phone}" class="bg-white text-red-600 border border-red-200 px-4 py-1.5 rounded-full text-xs font-bold shadow-sm active:scale-95 transition-transform flex items-center"><i class="fas fa-phone-alt mr-1.5"></i>Call</a></div>`).join('')}</div>
+                    </div>
+                </div>`;
+        }
+
+        // --- 4. Budget Logic (Updated with Chart.js) ---
+        function renderBudgetPage() {
+            let listHtml = '';
+            let totalJPY = 0;
+            // Category Totals for Chart
+            let catTotals = { food: 0, transport: 0, shop: 0 };
+
+            const expensesToRender = [...localExpenses].sort((a, b) => {
+                const dateA = a.date?.seconds || 0;
+                const dateB = b.date?.seconds || 0;
+                return dateB - dateA;
+            });
+
+            expensesToRender.forEach(ex => {
+                const amt = parseInt(ex.amount);
+                totalJPY += amt;
+                if(catTotals[ex.category] !== undefined) {
+                    catTotals[ex.category] += amt;
+                }
+                
+                let icon = '💸';
+                let iconBg = 'bg-gray-100';
+                if(ex.category === 'food') { icon = '🍜'; iconBg = 'bg-orange-100 text-orange-600'; }
+                if(ex.category === 'transport') { icon = '🚌'; iconBg = 'bg-blue-100 text-blue-600'; }
+                if(ex.category === 'shop') { icon = '🎁'; iconBg = 'bg-pink-100 text-pink-600'; }
+
+                let timeStr = '';
+                if(ex.date && ex.date.seconds) {
+                    const d = new Date(ex.date.seconds * 1000);
+                    timeStr = `${d.getMonth()+1}/${d.getDate()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+                }
+                const twdVal = Math.round(amt * EXCHANGE_RATE);
+
+                listHtml += `
+                    <div onclick="openEditModal('${ex.id}')" class="flex justify-between items-center bg-white p-4 rounded-xl mb-3 card-shadow animate-fade-in cursor-pointer active:scale-[0.98] transition-transform relative group">
+                        <div class="flex items-center">
+                            <div class="${iconBg} w-10 h-10 rounded-full flex items-center justify-center mr-3 text-lg shadow-sm">${icon}</div>
+                            <div>
+                                <div class="font-bold text-gray-800 text-sm">${ex.item}</div>
+                                <div class="text-[10px] text-gray-400 font-mono flex items-center"><i class="far fa-clock mr-1"></i>${timeStr}</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold text-gray-800 font-mono">¥${amt.toLocaleString()}</div>
+                            <div class="text-[10px] text-gray-400 font-medium">≈ NT$${twdVal.toLocaleString()}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            const totalTWD = Math.round(totalJPY * EXCHANGE_RATE);
+
+            mainContent.innerHTML = `
+                <div class="animate-fade-in">
+                    <!-- Summary Card -->
+                    <div class="bg-gray-900 text-white p-6 rounded-2xl shadow-xl mb-6 text-center relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-gray-800 rounded-full mix-blend-overlay opacity-50 -mr-10 -mt-10"></div>
+                        <div class="relative z-10">
+                            <div class="text-xs font-medium text-gray-400 mb-1 uppercase tracking-widest">總支出 Total</div>
+                            <div class="text-4xl font-black tracking-tight mb-1">¥${totalJPY.toLocaleString()}</div>
+                            <div class="text-sm text-gray-400 bg-gray-800/50 inline-block px-3 py-1 rounded-full">≈ NT$${totalTWD.toLocaleString()}</div>
+                        </div>
+                    </div>
+
+                    <!-- CHART AREA -->
+                    <div class="bg-white p-5 rounded-2xl card-shadow mb-6 flex flex-col items-center">
+                        <h4 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-4 w-full text-left">Spending Analysis</h4>
+                        <div class="w-48 h-48 relative">
+                            <canvas id="expenseChart"></canvas>
+                             <!-- Centered Text in Donut -->
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <span class="text-gray-300 text-xs font-mono">JPY</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex justify-between items-end mb-4 px-1">
+                        <h3 class="font-bold text-gray-700 text-lg">支出明細 <span class="text-xs font-normal text-gray-400 ml-2">(點擊編輯)</span></h3>
+                        <button onclick="openAddModal()" class="bg-red-500 hover:bg-red-600 text-white w-10 h-10 rounded-full shadow-lg shadow-red-200 flex items-center justify-center transition-all active:scale-90">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+
+                    <!-- List -->
+                    <div class="pb-20 space-y-2">
+                        ${listHtml || '<div class="flex flex-col items-center justify-center py-12 text-gray-300"><i class="fas fa-receipt text-4xl mb-3"></i><p class="text-sm">尚無記帳資料</p></div>'}
+                    </div>
+                </div>
+            `;
+
+            // RENDER CHART
+            const ctx = document.getElementById('expenseChart');
+            if(ctx) {
+                if (expenseChartInstance) expenseChartInstance.destroy(); // Prevent memory leaks/glitches
+                
+                // If no data, show empty chart visual
+                const hasData = totalJPY > 0;
+                const dataValues = hasData ? [catTotals.food, catTotals.transport, catTotals.shop] : [1, 0, 0];
+                const bgColors = hasData ? ['#FB923C', '#60A5FA', '#F472B6'] : ['#E5E7EB', '#E5E7EB', '#E5E7EB']; // Orange-400, Blue-400, Pink-400 or Gray
+
+                expenseChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['食物', '交通', '購物'],
+                        datasets: [{
+                            data: dataValues,
+                            backgroundColor: bgColors,
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '75%', // Thinner ring
+                        plugins: {
+                            legend: { display: false }, // Hide default legend
+                            tooltip: { enabled: hasData } // Disable tooltip if empty
+                        },
+                        animation: {
+                            animateScale: true,
+                            animateRotate: true
+                        }
+                    }
+                });
+            }
+        }
+
+        // --- 5. Modal Logic ---
+        function openAddModal() {
+            editingExpenseId = null; 
+            document.getElementById('modal-title').innerText = "新增支出";
+            document.getElementById('btn-save').innerText = "儲存紀錄";
+            document.getElementById('btn-delete').classList.add('hidden'); 
+            
+            document.getElementById('expense-item').value = '';
+            document.getElementById('expense-amount').value = '';
+            document.getElementById('twd-preview').innerText = '≈ NT$0';
+            setCategory('food');
+            toggleModalDisplay(true);
+        }
+
+        function openEditModal(id) {
+            const expense = localExpenses.find(e => e.id === id);
+            if (!expense) return;
+
+            editingExpenseId = id; 
+            document.getElementById('modal-title').innerText = "編輯支出";
+            document.getElementById('btn-save').innerText = "更新紀錄";
+            document.getElementById('btn-delete').classList.remove('hidden'); 
+
+            document.getElementById('expense-item').value = expense.item;
+            document.getElementById('expense-amount').value = expense.amount;
+            document.getElementById('twd-preview').innerText = `≈ NT$${Math.round(expense.amount * EXCHANGE_RATE)}`;
+            setCategory(expense.category);
+            toggleModalDisplay(true);
+        }
+
+        function closeBudgetModal() { toggleModalDisplay(false); }
+        function toggleModalDisplay(show) {
+            const modal = document.getElementById('budget-modal');
+            if(show) modal.classList.remove('hidden'); else modal.classList.add('hidden');
+        }
+
+        function setCategory(cat) {
+            expenseCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                if(btn.dataset.cat === cat) {
+                    btn.classList.remove('bg-white', 'text-gray-600', 'border-gray-200');
+                    btn.classList.add('bg-gray-800', 'text-white', 'border-gray-800', 'shadow-md');
+                } else {
+                    btn.classList.add('bg-white', 'text-gray-600', 'border-gray-200');
+                    btn.classList.remove('bg-gray-800', 'text-white', 'border-gray-800', 'shadow-md');
+                }
+            });
+        }
+
+        async function handleSaveExpense() {
+            const item = document.getElementById('expense-item').value;
+            const amount = parseInt(document.getElementById('expense-amount').value);
+            if(!item || !amount) { alert('請輸入項目與金額'); return; }
+            const btn = document.getElementById('btn-save');
+            btn.disabled = true; btn.innerText = '處理中...';
+
+            try {
+                if (window.db) {
+                    if (editingExpenseId) {
+                        const docRef = window.dbDoc(window.db, "expenses", editingExpenseId);
+                        await window.dbUpdateDoc(docRef, { item, amount, category: expenseCategory });
+                    } else {
+                        await window.dbAddDoc(window.dbCollection(window.db, "expenses"), { item, amount, category: expenseCategory, date: window.dbTimestamp() });
+                    }
+                } else {
+                    if (editingExpenseId) {
+                        const idx = localExpenses.findIndex(e => e.id === editingExpenseId);
+                        if(idx !== -1) { localExpenses[idx].item = item; localExpenses[idx].amount = amount; localExpenses[idx].category = expenseCategory; }
+                    } else {
+                        localExpenses.push({ id: Date.now().toString(), item, amount, category: expenseCategory, date: { seconds: Date.now()/1000 } });
+                    }
+                    renderBudgetPage();
+                }
+                closeBudgetModal();
+            } catch (e) { alert("儲存失敗: " + e.message); } finally { btn.disabled = false; }
+        }
+
+        async function deleteExpense() {
+            if(!editingExpenseId || !confirm("確定要刪除這筆紀錄嗎？")) return;
+            try {
+                if (window.db) {
+                    await window.dbDeleteDoc(window.dbDoc(window.db, "expenses", editingExpenseId));
+                } else {
+                    localExpenses = localExpenses.filter(e => e.id !== editingExpenseId);
+                    renderBudgetPage();
+                }
+                closeBudgetModal();
+            } catch(e) { alert("刪除失敗"); }
+        }
+
+        function initBudgetListener() {
+            if (!window.db) return;
+            const q = window.dbQuery(window.dbCollection(window.db, "expenses"), window.dbOrderBy("date", "desc"));
+            window.dbOnSnapshot(q, (snapshot) => {
+                localExpenses = [];
+                snapshot.forEach((doc) => { localExpenses.push({ id: doc.id, ...doc.data() }); });
+                if (currentTab === 'budget') renderBudgetPage();
+            });
+        }
+
+        // --- Weather Utility ---
+        function fetchWeather(query) {
+            const display = document.getElementById('weather-display');
+            display.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i>更新中`;
+            setTimeout(() => {
+                const isSnow = query.includes('Shirakawa') || query.includes('Gujo');
+                const temp = isSnow ? -2 : 12;
+                display.innerHTML = `<i class="fas ${isSnow ? 'fa-snowflake text-blue-400' : 'fa-cloud-sun text-orange-400'} mr-1.5"></i>${temp}°C`;
+            }, 600);
+        }
+    </script>
+</body>
+</html>
