@@ -1,4 +1,4 @@
-// data.js - 完整附錄整合版
+// data.js - 交通攻略完全版
 const itineraryData = [
   {
     day: "D1",
@@ -11,41 +11,32 @@ const itineraryData = [
         time: "20:50",
         type: "transport",
         title: "抵達中部國際機場",
-        desc: "入境約 10-25 分鐘。名鐵售票口位於入境大廳左側。",
-        tips: "【親子提醒】若孩子會睡著，建議買 μSKY 兒童指定席；若可抱著則免票 (4歲以下)。",
-        transportInfo: {
-            route: "名鐵 μSKY (指定席)",
+        desc: "入境後請前往「名鐵旅遊廣場」購票。",
+        icon: "🛬",
+        // 新增：詳細交通卡片資料
+        transportDetail: {
+            mode: "train",
+            name: "名鐵 μSKY (指定席)",
+            lineColor: "#DC2626", // 名鐵紅
+            route: "中部國際機場 → 名鐵名古屋",
             price: "成人 ¥1,250 / 兒童 ¥630",
-            color: "名鐵紅"
-        },
-        icon: "🛬"
+            tags: ["全部對號座", "需兩張票"],
+            steps: [
+                "入境大廳左側「名鐵售票處」",
+                "購買：乘車券(¥890) + μ-ticket(¥360)",
+                "4歲以下不佔位免費 (若要佔位需買兒童票)",
+                "搭乘 1 號月台發車"
+            ]
+        }
       },
       {
         time: "22:00",
         type: "food",
         title: "晚餐：味仙 (名古屋駅前店)",
-        desc: "距離飯店近，出餐快。推薦「台式拉麵 (American版不辣)」、青菜、炒飯。",
+        desc: "台式拉麵(American版不辣)、青菜、炒飯。",
         tags: ["必吃:台式拉麵", "營業至23:00"],
         budget: "¥1,000-¥1,800",
-        nav: "https://maps.google.com/?q=味仙+名古屋駅前店",
-        alternatives: [
-            { name: "世界的山ちゃん (名駅店)", desc: "夢幻手羽先(雞翅)、兒童可吃炒飯/玉子燒", nav: "https://maps.google.com/?q=世界の山ちゃん+名駅店" },
-            { name: "便利商店宵夜", desc: "Lawson/7-11 炸雞串、飯糰、沙拉", type: "takeout" }
-        ]
-      },
-      {
-        time: "23:00",
-        type: "shop",
-        title: "隔日早餐補給",
-        desc: "建議回飯店前先買好明天的早餐與水。",
-        nav: "https://maps.google.com/?q=MaxValu+Taiko",
-        shoppingList: [
-            "大瓶礦泉水 (便宜)",
-            "麵包/飯糰",
-            "優格/牛奶",
-            "MaxValu 超市 (步行12分) 24hr",
-            "Lawson/7-11 (步行1-3分)"
-        ]
+        nav: "https://maps.google.com/?q=味仙+名古屋駅前店"
       }
     ]
   },
@@ -61,48 +52,46 @@ const itineraryData = [
         type: "transport",
         title: "前往金城ふ頭",
         desc: "搭乘青波線 (Aonami Line)。",
-        transportInfo: {
-            route: "あおなみ線",
-            price: "成人 ¥870 / 兒童 ¥440 (一日券更划算)",
-            note: "4歲免票",
-            color: "深藍色"
-        },
-        nav: "https://maps.google.com/?q=名古屋駅青波線"
+        nav: "https://maps.google.com/?q=名古屋駅青波線",
+        transportDetail: {
+            mode: "train",
+            name: "あおなみ線 (青波線)",
+            lineColor: "#1D4ED8", // 深藍色
+            route: "名古屋站 → 金城ふ頭",
+            price: "成人 ¥360 / 兒童 ¥180",
+            tags: ["不可使用地鐵一日券"],
+            steps: [
+                "名古屋站太閤通口方向",
+                "尋找藍色 Aonami Line 指標",
+                "終點站下車，步行 5 分鐘抵達樂園"
+            ]
+        }
       },
       {
         time: "09:30",
         type: "spot",
         title: "樂園攻略：第一輪必玩",
-        desc: "入園後直衝最深處，避開人潮。",
+        desc: "Ninjago, Submarine Adventure。入園直衝最深處。",
         tips: "【動線】Ninjago (忍者) → Submarine Adventure (潛水艇) → Lost Kingdom (射擊)。",
-        photoSpots: [
-            "入園口巨型樂高恐龍",
-            "MiniLand 迷你樂園 (室內休息好去處)"
-        ]
+        photoSpots: ["入園口巨型樂高恐龍", "MiniLand 迷你樂園"]
       },
       {
         time: "12:00",
         type: "food",
-        title: "午餐：三大主餐店",
-        desc: "建議 11:30 前用餐避開人潮。",
+        title: "午餐：Brick House Burger",
+        desc: "樂高造型漢堡，出餐最快。",
         tags: ["親子餐廳"],
         alternatives: [
-            { name: "Brick House Burger", desc: "樂高造型漢堡 (出餐最快)", budget: "¥1,200~" },
-            { name: "Coral Reef Pizza", desc: "義大利麵/披薩吃到飽", budget: "¥1,800~" },
+            { name: "Coral Reef Pizza", desc: "披薩吃到飽", budget: "¥1,800~" },
             { name: "Chicken Diner", desc: "炸雞兒童餐", budget: "¥1,000~" }
         ]
       },
       {
         time: "18:00",
         type: "food",
-        title: "晚餐：天むす 千壽 (炸蝦飯糰)",
-        desc: "位於 JR 高島屋 B1。最省時方案，買回飯店吃。",
-        tags: ["外帶美食", "必吃:炸蝦飯糰"],
-        nav: "https://maps.google.com/?q=天むす+千壽+JR高島屋",
-        alternatives: [
-            { name: "まるは食堂 (名古屋港店)", desc: "靠近水族館，炸蝦定食", nav: "https://maps.google.com/?q=まるは食堂+名古屋港店" },
-            { name: "世界的山ちゃん", desc: "外帶雞翅回飯店", nav: "https://maps.google.com/?q=世界の山ちゃん+名駅店" }
-        ]
+        title: "晚餐：天むす 千壽",
+        desc: "JR 高島屋 B1。最省時方案，買回飯店吃。",
+        tags: ["必吃:炸蝦飯糰"]
       }
     ]
   },
@@ -118,59 +107,41 @@ const itineraryData = [
         type: "transport",
         title: "名鐵巴士中心集合",
         desc: "4F 太閤通口銀時計下，請提前 15 分鐘抵達。",
-        transportInfo: {
-            route: "KKday 巴士團",
-            note: "4歲小孩含座位 (不需抱)",
-            gear: "車上可穿薄長袖，下車需厚外套"
-        },
-        nav: "https://maps.google.com/?q=名鐵巴士中心"
+        nav: "https://maps.google.com/?q=名鐵巴士中心",
+        transportDetail: {
+            mode: "bus",
+            name: "KKday / 名鐵巴士",
+            lineColor: "#F97316", // 橘色
+            route: "名鐵巴士中心 4F → 高山 → 白川鄉",
+            price: "已含在團費中",
+            tags: ["4歲含座位", "車程2.5小時"],
+            steps: [
+                "名古屋站太閤通口",
+                "右轉直走 2 分鐘",
+                "搭手扶梯上 3F 再轉 4F 集合"
+            ]
+        }
       },
       {
         time: "11:30",
         type: "food",
-        title: "午餐：高山老街三選一",
-        desc: "上三之町商店街。",
-        alternatives: [
-            { name: "飛驒牛飯 匠家", desc: "【主推】小孩友善、出餐快、有飛驒牛丼", budget: "¥1,800~", nav: "https://maps.google.com/?q=肉の匠家+安川店" },
-            { name: "味の与平", desc: "品質最好，鐵板/陶板燒", budget: "¥2,500~", nav: "https://maps.google.com/?q=味の与平" },
-            { name: "丸明", desc: "A5飛驒牛燒肉，若排隊短非常值得", budget: "¥2,800~", nav: "https://maps.google.com/?q=丸明+高山" }
-        ]
-      },
-      {
-        time: "12:30",
-        type: "food",
-        title: "高山老街小吃 (邊走邊吃)",
-        desc: "小吃幾乎 3-5 分鐘可吃完。",
-        tags: ["散策"],
-        shoppingList: [
-            "金乃こって牛 (飛驒牛壽司三貫)",
-            "ぜん助 (飛驒牛串)",
-            "五平餅"
-        ]
+        title: "午餐：飛驒牛飯 匠家",
+        desc: "小孩友善、出餐快、有飛驒牛丼。",
+        nav: "https://maps.google.com/?q=肉の匠家+安川店"
       },
       {
         time: "14:30",
         type: "spot",
         title: "白川鄉合掌村",
-        desc: "請穿著防滑鞋。不建議推車。",
-        photoSpots: [
-            "河岸邊「合掌造 3 棟」 (經典視角)",
-            "合掌民家前木牌區",
-            "小河橋拍對岸倒影",
-            "積雪屋簷與小路交叉口"
-        ],
-        tips: "不建議帶4歲小孩去「城山展望台」(路滑+接駁車排隊久)。"
+        desc: "開放式雪地，請穿著防滑鞋。",
+        photoSpots: ["河岸邊「合掌造 3 棟」", "民家前木牌區"]
       },
       {
         time: "19:00",
         type: "food",
         title: "晚餐：しら河 (鰻魚三吃)",
-        desc: "清爽口味，榮 Gas Building 店。",
-        tags: ["名古屋名物", "預算:¥3000"],
-        nav: "https://maps.google.com/?q=しら河+栄ガスビル",
-        alternatives: [
-            { name: "ひつまぶし備長 (JR高島屋)", desc: "排隊較久但位置方便", nav: "https://maps.google.com/?q=ひつまぶし備長+名古屋" }
-        ]
+        desc: "榮 Gas Building 店。清爽口味。",
+        nav: "https://maps.google.com/?q=しら河+栄ガスビル"
       }
     ]
   },
@@ -185,46 +156,43 @@ const itineraryData = [
         time: "08:30",
         type: "transport",
         title: "前往吉卜力公園",
-        desc: "地鐵東山線 (黃色) → 藤が丘 → 轉乘 Linimo (綠色)。",
-        transportInfo: {
-            route: "地鐵+Linimo",
-            price: "成人 ¥760+¥380 / 4歲免票",
-            time: "約 50 分鐘"
+        desc: "需轉乘一次。地鐵轉磁浮。",
+        transportDetail: {
+            mode: "subway",
+            name: "東山線 + Linimo",
+            lineColor: "#FBBF24", // 東山線黃
+            route: "名古屋 → 藤が丘 → 愛・地球博記念公園",
+            price: "成人 ¥760 / 兒童 ¥380",
+            tags: ["需約 50 分鐘"],
+            steps: [
+                "搭乘地鐵東山線 (黃色) 往藤が丘",
+                "抵達終點站「藤が丘」",
+                "轉乘 Linimo 磁浮線 (綠色)",
+                "抵達「愛・地球博記念公園」站"
+            ]
         }
       },
       {
         time: "10:00",
         type: "spot",
-        title: "吉卜力大倉庫 (Grand Warehouse)",
-        desc: "全室內，請先將推車寄放於入口。",
-        tips: "【必看區域】1. 龍貓隧道 (Cat Bus) 2. 飛行造型展區 3. 無臉男拍照區 (名場面) 4. 借物少女場景。",
-        photoSpots: [
-            "中央大樓梯 (馬賽克磁磚)",
-            "無臉男電車場景"
-        ]
+        title: "吉卜力大倉庫",
+        desc: "全室內。必看：龍貓隧道、無臉男拍照區。",
+        tips: "大倉庫禁止推車入館，入口有免費寄放處。"
       },
       {
         time: "13:00",
         type: "food",
         title: "午餐：AEON 長久手",
-        desc: "距離公園一站 (公園北站)，選擇多且親子友善。",
-        tags: ["購物", "美食街"],
+        desc: "距離公園一站 (公園北站)，選擇多。",
         nav: "https://maps.google.com/?q=AEON+Mall+Nagakute",
-        shoppingList: [
-            "玩具反斗城 (很大)",
-            "3F 兒童用品區",
-            "Seria 百元店"
-        ]
+        shoppingList: ["玩具反斗城", "Seria 百元店"]
       },
       {
         time: "18:00",
         type: "food",
-        title: "晚餐：備選清單",
-        desc: "回到名古屋站周邊。",
-        alternatives: [
-            { name: "世界の山ちゃん", desc: "手羽先、炒飯 (親子適宜)", nav: "https://maps.google.com/?q=世界の山ちゃん+名駅店" },
-            { name: "味仙", desc: "台灣拉麵 (若D1沒吃到)", nav: "https://maps.google.com/?q=味仙+名古屋駅前店" }
-        ]
+        title: "晚餐：世界的山ちゃん",
+        desc: "夢幻手羽先(雞翅)。",
+        nav: "https://maps.google.com/?q=世界の山ちゃん+名駅店"
       }
     ]
   },
@@ -238,34 +206,35 @@ const itineraryData = [
       {
         time: "09:10",
         type: "transport",
-        title: "前往長島 Outlet",
-        desc: "名鐵巴士中心 4F。",
-        transportInfo: {
-            route: "ゆったりパック套票",
-            price: "成人 ¥3,000 (含車票+門票+購物金)",
-            note: "回程搭 μSKY 需劃位"
+        title: "前往長島溫泉",
+        desc: "購買套票最划算。",
+        transportDetail: {
+            mode: "bus",
+            name: "名鐵巴士 (ゆったりパック)",
+            lineColor: "#F97316", // 橘色
+            route: "名鐵巴士中心 4F → 長島溫泉",
+            price: "套票 成人 ¥3,000 / 兒童 ¥1,500",
+            tags: ["含門票+車票+購物金"],
+            steps: [
+                "前往名鐵巴士中心 4F 購票",
+                "購買「ゆったりパック」套票",
+                "搭乘直達巴士約 50 分鐘"
+            ]
         }
       },
       {
         time: "10:10",
         type: "shop",
         title: "三井 Outlet 爵士之夢",
-        desc: "推薦動線：入口 → North Area (精品/運動) → South Area (生活/兒童)。",
-        tips: "South Area 有樂高、麵包超人童裝 (petit main, BREEZE)。",
-        nav: "https://maps.google.com/?q=Jazz+Dream+Nagashima",
-        food: "午餐推薦：矢場味噌豬排 (餐廳區)、VANSAN (義大利麵/親子友善)。"
+        desc: "推薦：South Area (兒童/生活)。",
+        nav: "https://maps.google.com/?q=Jazz+Dream+Nagashima"
       },
       {
         time: "16:00",
         type: "spot",
         title: "名花之里燈會",
-        desc: "日本最大燈海。17:00-18:00 點燈。",
-        photoSpots: [
-            "光之隧道",
-            "大草坪主燈秀",
-            "鏡池 (紅葉倒影)"
-        ],
-        tips: "【重要】戶外非常冷，請務必戴手套、圍巾。溫室「Begonia Garden」是免費且溫暖的休息點。"
+        desc: "搭乘 Outlet 接駁車前往。17:00 點燈。",
+        tips: "戶外非常冷，務必帶手套圍巾。溫室是休息好去處。"
       }
     ]
   },
@@ -280,23 +249,26 @@ const itineraryData = [
         time: "09:10",
         type: "transport",
         title: "前往牧歌之里",
-        desc: "搭乘 KKday 巴士團。",
-        tips: "【裝備檢查】墨鏡 (雪盲)、防水手套 (必備)、防滑靴、備用襪子 (濕了可換)。"
+        desc: "KKday 巴士團。",
+        transportDetail: {
+            mode: "bus",
+            name: "KKday 觀光巴士",
+            lineColor: "#2563EB", // 藍色
+            route: "名古屋 → 牧歌之里",
+            price: "含在團費",
+            steps: [
+                "集合地點同 D3 (太閤通口)",
+                "車程約 1.5 小時",
+                "車上建議讓小孩補眠"
+            ]
+        }
       },
       {
         time: "10:30",
         type: "spot",
-        title: "冰雪樂園",
-        desc: "適合4歲：滑雪盆 (Sledding)、堆雪人、餵羊。",
-        tips: "注意：氣溫高時地面會有『融雪』，非常濕滑，走路請走雪厚的地方。",
-        food: "午餐：園區內『ふる里亭』(牛奶鍋、咖哩飯)。"
-      },
-      {
-        time: "15:00",
-        type: "spot",
-        title: "牧華溫泉",
-        desc: "玩雪後直接泡湯。有毛巾租借。",
-        tips: "日本公共澡堂需裸湯，刺青需遮蓋。泡完記得喝瓶飛驒牛奶。"
+        title: "冰雪樂園 & 溫泉",
+        desc: "滑雪盆、堆雪人。結束後去牧華溫泉泡湯。",
+        tips: "注意：氣溫高時地面易融雪濕滑。"
       }
     ]
   },
@@ -311,41 +283,35 @@ const itineraryData = [
         time: "10:00",
         type: "spot",
         title: "名古屋市科學館",
-        desc: "直奔 2F 兒童科學館、3F 放電實驗。",
-        nav: "https://maps.google.com/?q=名古屋市科學館",
-        tips: "B2 恐龍骨架是隱藏亮點。門票成人¥400，中學生以下免費。"
+        desc: "地鐵伏見站下車。",
+        transportDetail: {
+            mode: "subway",
+            name: "地鐵東山線/鶴舞線",
+            lineColor: "#2563EB", // 鶴舞藍
+            route: "名古屋 → 伏見",
+            price: "成人 ¥210",
+            steps: [
+                "搭乘地鐵一站即達",
+                "4/5號出口步行 5 分鐘",
+                "大球體建築即是"
+            ]
+        },
+        nav: "https://maps.google.com/?q=名古屋市科學館"
       },
       {
         time: "14:00",
         type: "food",
         title: "大須商店街",
-        desc: "週末人多，推車建議摺疊。",
-        tags: ["邊走邊吃"],
-        shoppingList: [
-            "金魚虎燒 (金魚造型鯛魚燒)",
-            "五平餅 (味噌烤飯糰)",
-            "Alice on Wednesday (愛麗絲專賣店)",
-            "Seria 百元店 (大型店)"
-        ],
-        nav: "https://maps.google.com/?q=大須觀音通"
+        desc: "由伏見站步行或搭鶴舞線至「大須觀音站」。",
+        shoppingList: ["金魚虎燒", "五平餅", "Seria 大型店"]
       },
       {
         time: "15:15",
         type: "shop",
-        title: "唐吉軻德 (榮本店) 掃貨",
-        desc: "大型旗艦店。1F 伴手禮，2F 藥妝，3F 兒童。",
-        tips: "建議媽媽逛藥妝，爸爸帶小孩去 3F 玩玩具或看魚。",
+        title: "唐吉軻德 (榮本店)",
+        desc: "榮站步行 6 分鐘。",
         nav: "https://maps.google.com/?q=Don+Quijote+Sakae",
-        shoppingList: [
-            "【零食】麵包超人餅乾盒",
-            "【零食】Jagabee 薯條 (盒裝)",
-            "【零食】KitKat 抹茶/草莓口味",
-            "【藥妝】Rohto V5 眼藥水 (金色/銀色)",
-            "【藥妝】Muhi 麵包超人止癢貼",
-            "【藥妝】PAIR 痘痘藥",
-            "【兒童】麵包超人牙刷 3入組",
-            "【兒童】泡澡球 (內含玩具)"
-        ]
+        shoppingList: ["麵包超人餅乾", "Rohto眼藥水", "泡澡球"]
       }
     ]
   },
@@ -359,21 +325,28 @@ const itineraryData = [
       {
         time: "09:00",
         type: "transport",
-        title: "中部國際機場 (Centrair)",
-        desc: "報到後，可至 4F 藍天城逛逛。",
-        tips: "若行李已托運，可帶小孩去機場的『兒童遊戲區』放電 (2F)。"
+        title: "前往中部國際機場",
+        desc: "從飯店步行至名鐵名古屋站。",
+        transportDetail: {
+            mode: "train",
+            name: "名鐵 μSKY",
+            lineColor: "#DC2626", // 名鐵紅
+            route: "名古屋 → 機場",
+            price: "成人 ¥1,250",
+            tags: ["記得 D1 先買好回程票"],
+            steps: [
+                "使用 D1 預先買好的票",
+                "確認車次與座位",
+                "車程 28 分鐘"
+            ]
+        }
       },
       {
         time: "10:00",
         type: "shop",
-        title: "最後補貨：必買伴手禮",
-        desc: "入關前/後都有商店。",
-        shoppingList: [
-            "蝦仙貝之里 (えびせんべいの里) - 綜合包",
-            "坂角總本舖 - 蝦餅 (高級送禮)",
-            "世界的山ちゃん - 手羽先口味餅乾/真空包",
-            "赤福 (紅豆麻糬) - 保存期限短，需當天吃"
-        ]
+        title: "最後補貨",
+        desc: "蝦仙貝之里、坂角總本舖。",
+        tips: "若有零錢可在機場扭蛋區花完。"
       }
     ]
   }
@@ -386,7 +359,7 @@ const infoData = {
     checkIn: "14:00",
     checkOut: "11:00",
     phone: "+81-52-452-1255",
-    tips: "飯店提供兒童備品 (牙刷、拖鞋)。"
+    tips: "飯店提供兒童備品，離太閤通口步行 4 分鐘。"
   },
   emergency: [
     { name: "救護車/火警", phone: "119" },
@@ -395,10 +368,10 @@ const infoData = {
   ],
   packing: [
     "護照 (大人+小孩)",
-    "VJW 截圖 (入境審查)",
-    "網卡/漫遊設定",
-    "兒童推車 (建議輕便型)",
-    "常用藥品 (退燒、止瀉)",
-    "牙刷牙膏 (部分飯店不主動提供)"
+    "VJW 截圖",
+    "兒童推車",
+    "牙刷牙膏",
+    "常備藥品",
+    "禦寒手套/帽子 (玩雪用)"
   ]
 };
